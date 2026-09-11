@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py-mcp-order-v2"
+version = "0.1.0"
+description = "A MCP server to handle all order requests."
+dependencies = [
+    "httpx",
+    "uvicorn",
+    "fastapi",
+    "mcp",
+    "mcp[cli]",
+    "aiohttp",
+    "opentelemetry-sdk",
+    "opentelemetry-api",
+    "opentelemetry-instrumentation-aiohttp-client",
+    "opentelemetry-instrumentation-logging",
+    "opentelemetry-exporter-otlp",
+]
