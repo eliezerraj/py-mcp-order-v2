@@ -1,7 +1,6 @@
-# Build Stage
-FROM python:3.12-slim-bookworm AS builder
+# docker build -t py-mcp-order-v2 .
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -9,23 +8,20 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
+# Install dependencies first, leveraging Docker layer cache
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev
+    uv sync --no-install-project
 
-COPY . /app
+COPY . .
+
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+    uv sync
 
 # Final Runtime Stage
-FROM python:3.12-slim-bookworm AS runner
+FROM python:3.14-slim AS runner
 
 WORKDIR /app
-
-# Security: Non-root user
-RUN groupadd -g 10001 appgroup && \
-    useradd -u 10001 -g appgroup -s /bin/sh appuser
 
 COPY --from=builder --chown=appuser:appgroup /app/.venv /app/.venv
 COPY --from=builder --chown=appuser:appgroup /app/src /app/src
@@ -34,7 +30,5 @@ ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-USER 10001
-
 EXPOSE 8000
-CMD ["python", "-m", "mcp_server.main"]
+CMD ["python", "-m", "src.mcp_server.main"]

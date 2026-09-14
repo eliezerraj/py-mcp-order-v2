@@ -32,6 +32,6 @@ activate:
 # Run the Python application
 run:
 	@echo "Running application with environment variables..."
-	@bash -c "source ../../.venv/bin/activate && python ./src/mcp_server/main.py"
+	@bash -c "source ../../.venv/bin/activate && python -m src.mcp_server.main"
     
 .PHONY: all env activate run

@@ -1,6 +1,6 @@
 import logging
 
-from config.settings import settings
+from src.mcp_server.config.settings import settings
 
 logger = logging.getLogger(__name__)
 

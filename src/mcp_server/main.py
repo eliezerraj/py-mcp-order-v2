@@ -1,9 +1,5 @@
 import os
 import sys
-from pathlib import Path
-
-# Add project root directory to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import logging
 import httpx
@@ -22,8 +18,8 @@ from src.mcp_server.presentation.tool.info_tool import register_info_tool
 
 from src.mcp_server.infrastructure.telemetry.tracer import setup_tracer
 
-from config.logger import setup_logger
-from config.settings import settings
+from src.mcp_server.config.logger import setup_logger
+from src.mcp_server.config.settings import settings
 
 from mcp.server.mcpserver import MCPServer
 

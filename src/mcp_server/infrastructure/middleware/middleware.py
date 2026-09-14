@@ -5,7 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 from src.mcp_server.domain.dto.context import SecurityContext
-from config.logger import REQUEST_ID_CTX
+from src.mcp_server.config.logger import REQUEST_ID_CTX
 from src.mcp_server.infrastructure.context.request_context import (
     set_security_context,
     reset_security_context,
