@@ -14,7 +14,6 @@ from src.mcp_server.infrastructure.middleware.middleware import RequestContextMi
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 
 from src.mcp_server.presentation.tool.order_tool import register_order_tool
-from src.mcp_server.presentation.tool.info_tool import register_info_tool
 
 from src.mcp_server.infrastructure.telemetry.tracer import setup_tracer
 
@@ -22,6 +21,12 @@ from src.mcp_server.config.logger import setup_logger
 from src.mcp_server.config.settings import settings
 
 from mcp.server.mcpserver import MCPServer
+
+from src.mcp_server.presentation.prompt.order_prompt import (
+    register_prompt as register_order_prompt,
+)
+
+from src.mcp_server.presentation.resource.order_resource import register_order_resource
 
 setup_logger(settings.LOG_LEVEL, 
              settings.APP_NAME, 
@@ -54,7 +59,12 @@ async def server_lifespan(app):
             
             # Register order tool with the MCP server
             register_order_tool(mcp, order_usecase)
-            register_info_tool(mcp)
+
+            # Register order prompts
+            register_order_prompt(mcp)
+
+            # Register resource
+            register_order_resource(mcp, order_usecase)
         
         yield
     finally:

@@ -9,8 +9,8 @@ class OrderUseCase:
         logger.info("OrderUseCase initialized SUCCESSFULLY.")
         self.http_adapter = http_adapter
             
-    async def get_order_info(self):
-        logger.info(f"Fetching order info asynchronously")
+    async def get_order_service_info(self):
+        logger.info(f"Fetching order service info asynchronously")
         
         try:
             response = await self.http_adapter.request(
@@ -19,7 +19,7 @@ class OrderUseCase:
                 params=None,
             )
         except Exception as e:
-            logger.error(f"Error fetching order info asynchronously: {e}")
+            logger.error(f"Error fetching order service info asynchronously: {e}")
             response = {"message": str(e)}
         
         return response

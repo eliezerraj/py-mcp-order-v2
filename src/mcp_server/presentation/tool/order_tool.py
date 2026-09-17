@@ -11,38 +11,6 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
     logger.info("Registering order tool SUCCESSFULLY.")
 
     @mcp.tool()
-    async def get_order_info():
-        """
-        Retrieves general order information.
-        Use this tool when the user wants to get an overview of the orders.
-        """
-        logger.info(f"Fetching order info")
-        
-        try:
-            response = await order_use_case.get_order_info() 
-        except Exception as e:
-            logger.error(f"Error fetching order info: {e}")
-            response = {"message": str(e)}
-        
-        return response
-
-    @mcp.tool()
-    async def get_order(order_number):
-        """
-        Retrieves order information for a given order number.
-        Use this tool when the user wants to get details about a specific order.
-        """
-        logger.info(f"Fetching order for order number: {order_number}")
-        
-        try:
-            response = await order_use_case.get_order(order_number) 
-        except Exception as e:
-            logger.error(f"Error fetching order for order number {order_number}: {e}")
-            response = {"message": str(e)}
-        
-        return response
-
-    @mcp.tool()
     async def post_order(payload: OrderPayload):
         """
         Creates a new order with the given payload.
@@ -92,5 +60,6 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
             logger.error(f"Error creating checkout with payload {payload}: {e}")
             response = {"message": str(e)}
         
-        return response    
-    return get_order_info, get_order, post_order, post_checkout
+        return response
+    
+    return post_order, post_checkout
