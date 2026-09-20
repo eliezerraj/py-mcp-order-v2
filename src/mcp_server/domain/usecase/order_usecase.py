@@ -71,3 +71,22 @@ class OrderUseCase:
             response = {"message": str(e)}
 
         return response 
+    
+    # ----------------
+    # Data Providers
+    # ---------------
+    async def get_time_series_order_items(self, product, limit=7, offset=0):
+        logger.info(f"Fetching time series order items for product: {product}")
+        
+        try:
+            path = f"/v1/order/time-series-order-items?product={product}&limit={limit}&offset={offset}"
+            response = await self.http_adapter.request(
+                method="GET",
+                path=path,
+                params={"product": product, "limit": limit, "offset": offset},
+            )
+        except Exception as e:
+            logger.error(f"Error fetching order for product {product}: {e}")
+            response = {"message": str(e)}
+
+        return response 

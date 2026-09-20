@@ -50,5 +50,21 @@ def register_order_resource(mcp: "MCPServer", order_use_case: "OrderUseCase"):
             response = {"message": str(e)}
         
         return response
-    
-    return get_order, get_order_service_info, mcp_info
+
+    @mcp.resource("time_series_order_items://{product}{?limit,offset}")
+    async def get_time_series_order_items(product, limit=7, offset=0):
+        """
+        Retrieves time series order items for a given product SKU.
+        Use this tool when the user wants to get time series data for a specific product.
+        """
+        logger.info(f"Fetching time series order items for product: {product}")
+        
+        try:
+            response = await order_use_case.get_time_series_order_items(product, limit=limit, offset=offset) 
+        except Exception as e:
+            logger.error(f"Error fetching time series order items for product {product}: {e}")
+            response = {"message": str(e)}
+        
+        return response
+        
+    return get_order, get_order_service_info, get_time_series_order_items, mcp_info
