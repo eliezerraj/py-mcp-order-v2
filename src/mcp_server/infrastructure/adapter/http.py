@@ -2,6 +2,8 @@ import httpx
 import logging
 from typing import Any, Optional, Dict
 
+from src.mcp_server.domain.dto.apperrs import AppError
+
 from opentelemetry import trace, propagate
 from src.mcp_server.infrastructure.context.request_context import (
     get_security_context,
@@ -57,7 +59,7 @@ class HttpAdapter:
         # Inject OpenTelemetry trace context propagation into outgoing headers
         propagate.inject(merged_headers)
 
-        span_name = f"HTTP {method}"
+        span_name = f"adapter.request HTTP {method} {url}"
         with tracer.start_as_current_span(span_name) as span:
             span.set_attribute("http.method", method)
             span.set_attribute("http.url", url)
@@ -83,15 +85,14 @@ class HttpAdapter:
                     return response.json()
 
             except httpx.HTTPStatusError as e:
-                logger.error(
-                    f"HTTP error {e.response.status_code} for {method} {url}: {e.response.text}"
-                )
+                logger.error(f"HTTP error {e.response.status_code} for {method} {url}: {e.response.text}")
                 span.record_exception(e)
-                return None
+                raise AppError(message=e.response.text, uri=url, status_code=e.response.status_code) from e
             except httpx.HTTPError as e:
                 logger.error(f"Network/transport error for {method} {url}: {e}")
                 span.record_exception(e)
-                return None
+                raise AppError(message=f"Network/transport error for {method} {url}: {e}", uri=url, status_code=None) from e
+
 
     # Optional convenience helpers delegating to request():
     async def get(self, path: str, params: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Optional[Any]:

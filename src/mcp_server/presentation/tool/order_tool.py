@@ -1,11 +1,14 @@
 import logging
 
+from opentelemetry import trace
+
 from src.mcp_server.domain.dto.context import SecurityContext
 from src.mcp_server.domain.dto.order import OrderPayload
 from src.mcp_server.domain.dto.checkout import CheckoutPayload
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
     
 def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
     logger.info("Registering order tool SUCCESSFULLY.")
@@ -28,11 +31,12 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
         """
         logger.info(f"Creating order with payload: {payload}")
         
-        try:
-            response = await order_use_case.post_order(payload.model_dump()) 
-        except Exception as e:
-            logger.error(f"Error creating order with payload {payload}: {e}")
-            response = {"message": str(e)}
+        with tracer.start_as_current_span("tool.post_order"):
+            try:
+                response = await order_use_case.post_order(payload.model_dump()) 
+            except Exception as e:
+                logger.error(f"Error creating order with payload {payload}: {e}")
+                response = {"message": str(e)}
         
         return response
 
@@ -54,11 +58,12 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
         """
         logger.info(f"Creating checkout with payload: {payload}")
         
-        try:
-            response = await order_use_case.post_checkout(payload.model_dump()) 
-        except Exception as e:
-            logger.error(f"Error creating checkout with payload {payload}: {e}")
-            response = {"message": str(e)}
+        with tracer.start_as_current_span("tool.post_checkout"):
+            try:
+                response = await order_use_case.post_checkout(payload.model_dump()) 
+            except Exception as e:
+                logger.error(f"Error creating checkout with payload {payload}: {e}")
+                response = {"message": str(e)}
         
         return response
     

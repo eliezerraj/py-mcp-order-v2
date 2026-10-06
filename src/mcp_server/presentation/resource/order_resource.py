@@ -1,10 +1,13 @@
 import logging
 
-from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
+from opentelemetry import trace
 
+from src.mcp_server.domain.dto.apperrs import AppError
+from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 from src.mcp_server.config.settings import settings
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
 def register_order_resource(mcp: "MCPServer", order_use_case: "OrderUseCase"):
     logger.info("Registering order resource SUCCESSFULLY.")
@@ -27,11 +30,14 @@ def register_order_resource(mcp: "MCPServer", order_use_case: "OrderUseCase"):
         """
         logger.info(f"Fetching order service info")
         
-        try:
-            response = await order_use_case.get_order_service_info() 
-        except Exception as e:
-            logger.error(f"Error fetching order service info: {e}")
-            response = {"message": str(e)}
+        with tracer.start_as_current_span("resource.get_order_service_info"):
+            try:
+                response = await order_use_case.get_order_service_info() 
+            except AppError as e:
+                return e.to_dict() 
+            except Exception as e:
+                logger.error(f"Error fetching order service info: {e}")
+                response = {"message": str(e)}
         
         return response
 
@@ -43,11 +49,14 @@ def register_order_resource(mcp: "MCPServer", order_use_case: "OrderUseCase"):
         """
         logger.info(f"Fetching order for order number: {order_number}")
         
-        try:
-            response = await order_use_case.get_order(order_number) 
-        except Exception as e:
-            logger.error(f"Error fetching order for order number {order_number}: {e}")
-            response = {"message": str(e)}
+        with tracer.start_as_current_span("resource.get_order"):
+            try:
+                response = await order_use_case.get_order(order_number) 
+            except AppError as e:
+                return e.to_dict() 
+            except Exception as e:
+                logger.error(f"Error fetching order for order number {order_number}: {e}")
+                response = {"message": str(e)}
         
         return response
 
@@ -59,11 +68,14 @@ def register_order_resource(mcp: "MCPServer", order_use_case: "OrderUseCase"):
         """
         logger.info(f"Fetching time series order items for product: {product}")
         
-        try:
-            response = await order_use_case.get_time_series_order_items(product, limit=limit, offset=offset) 
-        except Exception as e:
-            logger.error(f"Error fetching time series order items for product {product}: {e}")
-            response = {"message": str(e)}
+        with tracer.start_as_current_span("resource.get_time_series_order_items"):
+            try:
+                response = await order_use_case.get_time_series_order_items(product, limit=limit, offset=offset) 
+            except AppError as e:
+                return e.to_dict() 
+            except Exception as e:
+                logger.error(f"Error fetching time series order items for product {product}: {e}")
+                response = {"message": str(e)}
         
         return response
         

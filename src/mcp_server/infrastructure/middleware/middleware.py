@@ -38,7 +38,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             auth_token=auth_token,
         )
         
-        set_security_context(sec_context)
+        token = set_security_context(sec_context)
         
         try:
             response = await call_next(request)
@@ -46,4 +46,4 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             
             return response
         finally:
-            reset_security_context(set_security_context(sec_context))
+            reset_security_context(token)
