@@ -9,6 +9,9 @@ export SESSION_TIMEOUT=700
 
 export ORDER_URL=http://localhost:7001
 
+export METRICS_HOST=0.0.0.0
+export METRICS_PORT=8501
+
 export LOG_LEVEL=INFO
 export OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
 export OTEL_STDOUT_LOG_GROUP=True
@@ -25,6 +28,8 @@ env:
 	@echo "APP_NAME=$(APP_NAME)"
 	@echo "LOG_LEVEL=$(LOG_LEVEL)"
 	@echo "ORDER_URL=$(ORDER_URL)"
+	@echo "METRICS_HOST=$(METRICS_HOST)"
+	@echo "METRICS_PORT=$(METRICS_PORT)"
 activate:
 	@echo "Activate venv..."
 	@bash -c "source ../../.venv/bin/activate"

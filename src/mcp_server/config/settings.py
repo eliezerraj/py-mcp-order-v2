@@ -10,6 +10,9 @@ class Settings:
         self.SESSION_TIMEOUT = int(os.getenv("SESSION_TIMEOUT"))
    
         self.ORDER_URL = os.getenv("ORDER_URL")
+        
+        self.METRICS_HOST = os.getenv("HOST")
+        self.METRICS_PORT = int(os.getenv("METRICS_PORT", 8501))
 
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
         self.OTEL_EXPORTER_OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")

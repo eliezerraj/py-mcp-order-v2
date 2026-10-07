@@ -1,22 +1,22 @@
-import os
 import sys
-
 import logging
 import httpx
 import uvicorn
 
+from threading import Thread
+
 from contextlib import asynccontextmanager
 from opentelemetry import trace
 
+from prometheus_client import make_asgi_app
+
 from src.mcp_server.infrastructure.adapter.http import HttpAdapter
 from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
-
-from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
-
-from src.mcp_server.presentation.tool.order_tool import register_order_tool
-
+from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
 from src.mcp_server.infrastructure.telemetry.tracer import setup_tracer
 
+from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
+from src.mcp_server.presentation.tool.order_tool import register_order_tool
 from src.mcp_server.config.logger import setup_logger
 from src.mcp_server.config.settings import settings
 
@@ -81,11 +81,40 @@ mcp = MCPServer(name=settings.APP_NAME,
 # Add middleware to the MCP server application (ASGI compatible)
 mcp_app = mcp.streamable_http_app()
 mcp_app.add_middleware(RequestContextMiddleware)
+mcp_app.add_middleware(PrometheusMiddleware)
 
+# ---------------------------------
+# Prometheus server
+# ---------------------------------
+metrics_app = make_asgi_app()
+
+def run_metrics_server():
+    logger.info(f"PROMETHEUS SERVER: "f"{settings.METRICS_HOST}:{settings.METRICS_PORT}")
+
+    uvicorn.run(
+        metrics_app,
+        host=settings.METRICS_HOST,
+        port=int(settings.METRICS_PORT),
+        log_level=settings.LOG_LEVEL,
+    )
+
+# ---------------------------------
 # Server entrypoint function
+# ---------------------------------
 def run():
     """Server entrypoint execution handler."""
     try:
+        
+        # Start Prometheus server
+        metrics_thread = Thread(
+            target=run_metrics_server,
+            name="prometheus-server",
+            daemon=True,
+        )
+
+        metrics_thread.start()
+        
+        # Start MCP server
         logger.info(f"SERVER: {settings.HOST}:{settings.PORT}")
         
         uvicorn.run(mcp_app, 

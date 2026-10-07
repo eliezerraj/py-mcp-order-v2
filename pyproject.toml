@@ -18,4 +18,5 @@ dependencies = [
     "opentelemetry-instrumentation-aiohttp-client",
     "opentelemetry-instrumentation-logging",
     "opentelemetry-exporter-otlp",
+    "prometheus-client",
 ]

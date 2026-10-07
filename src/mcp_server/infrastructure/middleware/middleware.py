@@ -14,13 +14,13 @@ from src.mcp_server.infrastructure.context.request_context import (
 logger = logging.getLogger(__name__)
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
-    
+
     def __init__(self, app):
         super().__init__(app)
-        logger.info("Initializing Middleware SUCCESSFULLY")
+        logger.info("Initializing RequestContextMiddleware SUCCESSFULLY")
 
     async def dispatch(self, request: Request, call_next):
-        logger.info(f"Processing request: {request}")
+        logger.info(f"Processing RequestContextMiddleware request: {request}")
         
         request_id = request.headers.get("x-request-id", str(uuid.uuid4()))
         auth_header = request.headers.get("Authorization")

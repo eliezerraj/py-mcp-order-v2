@@ -1,7 +1,10 @@
 import logging
+import time
 
 from opentelemetry import trace
 
+from src.mcp_server.infrastructure.telemetry.metric import TOOL_CALLS, TOOL_DURATION, TOOL_ERRORS, ACTIVE_REQUESTS
+from src.mcp_server.config.settings import settings
 from src.mcp_server.domain.dto.context import SecurityContext
 from src.mcp_server.domain.dto.order import OrderPayload
 from src.mcp_server.domain.dto.checkout import CheckoutPayload
@@ -30,15 +33,23 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
             - price: The price of the item.
         """
         logger.info(f"Creating order with payload: {payload}")
-        
+                  
         with tracer.start_as_current_span("tool.post_order"):
+            ACTIVE_REQUESTS.inc()
+            start_time = time.perf_counter()
+            
             try:
                 response = await order_use_case.post_order(payload.model_dump()) 
+                TOOL_CALLS.labels(tool="post_order").inc()
             except Exception as e:
+                TOOL_ERRORS.labels(tool="post_order").inc()
                 logger.error(f"Error creating order with payload {payload}: {e}")
                 response = {"message": str(e)}
-        
-        return response
+            finally:
+                TOOL_DURATION.labels(tool="post_order").observe(time.perf_counter() - start_time)
+                ACTIVE_REQUESTS.dec()
+
+            return response
 
     @mcp.tool()
     async def post_checkout(payload: CheckoutPayload):
@@ -57,14 +68,22 @@ def register_order_tool(mcp: "MCPServer", order_use_case: OrderUseCase):
                 - credit_card: The credit card details if applicable.
         """
         logger.info(f"Creating checkout with payload: {payload}")
-        
+
         with tracer.start_as_current_span("tool.post_checkout"):
+            ACTIVE_REQUESTS.inc()
+            start_time = time.perf_counter()
+            
             try:
                 response = await order_use_case.post_checkout(payload.model_dump()) 
+                TOOL_CALLS.labels(tool="post_checkout").inc()
             except Exception as e:
+                TOOL_ERRORS.labels(tool="post_checkout").inc()
                 logger.error(f"Error creating checkout with payload {payload}: {e}")
                 response = {"message": str(e)}
+            finally:
+                TOOL_DURATION.labels(tool="post_checkout").observe(time.perf_counter() - start_time)
+                ACTIVE_REQUESTS.dec()
         
-        return response
+            return response
     
     return post_order, post_checkout
