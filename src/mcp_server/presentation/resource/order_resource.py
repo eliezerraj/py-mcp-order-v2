@@ -5,7 +5,13 @@ from opentelemetry import trace
 
 from src.mcp_server.domain.dto.apperrs import AppError
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
-from src.mcp_server.infrastructure.telemetry.metric import TOOL_CALLS, TOOL_DURATION, TOOL_ERRORS, ACTIVE_REQUESTS
+from src.mcp_server.infrastructure.telemetry.metric import (
+    TOOL_CALLS,
+    TOOL_DURATION, 
+    TOOL_ERRORS, 
+    ACTIVE_REQUESTS
+)
+
 from src.mcp_server.config.settings import settings
 
 logger = logging.getLogger(__name__)
