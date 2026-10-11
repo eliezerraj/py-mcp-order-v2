@@ -14,12 +14,12 @@ from src.mcp_server.infrastructure.adapter.http import HttpAdapter
 from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
 from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
 from src.mcp_server.infrastructure.telemetry.tracer import setup_tracer
-
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 from src.mcp_server.presentation.tool.order_tool import register_order_tool
 from src.mcp_server.config.logger import setup_logger
 from src.mcp_server.config.settings import settings
 
+from mcp.server.transport_security import TransportSecuritySettings
 from mcp.server.mcpserver import MCPServer
 
 from src.mcp_server.presentation.prompt.order_prompt import (
@@ -70,6 +70,20 @@ async def server_lifespan(app):
     finally:
         logger.info("Server shutting down SUCCESSFULLY.")
 
+# Transport security settings for the MCP server
+transport_security = TransportSecuritySettings(
+    enable_dns_rebinding_protection=True,
+    allowed_hosts=[
+        "localhost:*",
+        "127.0.0.1:*",
+        "py-mcp-order-v2:*",
+    ],
+    allowed_origins=[
+        "http://localhost:*",
+        "http://127.0.0.1:*",
+        "http://py-mcp-order-v2:*",
+    ],
+)
 #---------------------------------
 # setup MCP server
 #---------------------------------
@@ -79,7 +93,7 @@ mcp = MCPServer(name=settings.APP_NAME,
 )
 
 # Add middleware to the MCP server application (ASGI compatible)
-mcp_app = mcp.streamable_http_app()
+mcp_app = mcp.streamable_http_app(transport_security=transport_security)
 mcp_app.add_middleware(RequestContextMiddleware)
 mcp_app.add_middleware(PrometheusMiddleware)
 
