@@ -1,5 +1,7 @@
+from typing import Optional, Any
+
+from dataclasses import field
 from dataclasses import dataclass
-from typing import Optional
 
 @dataclass(frozen=True)
 class SecurityContext:
@@ -7,3 +9,8 @@ class SecurityContext:
     
     x_request_id: str
     auth_token: Optional[str] = None
+
+    subject: str | None = None
+    roles: frozenset[str] = field(default_factory=frozenset)
+    scopes: frozenset[str] = field(default_factory=frozenset)
+    claims: dict[str, Any] = field(default_factory=dict)

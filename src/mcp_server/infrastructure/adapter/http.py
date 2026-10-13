@@ -2,7 +2,7 @@ import httpx
 import logging
 from typing import Any, Optional, Dict
 
-from src.mcp_server.domain.dto.apperrs import AppError
+from src.mcp_server.common.exceptions.app_error import AppError
 
 from opentelemetry import trace, propagate
 from src.mcp_server.infrastructure.context.request_context import (
@@ -11,7 +11,6 @@ from src.mcp_server.infrastructure.context.request_context import (
 
 tracer = trace.get_tracer(__name__)
 logger = logging.getLogger(__name__)
-
 
 class HttpAdapter:
     def __init__(self, base_url: str):
@@ -87,12 +86,11 @@ class HttpAdapter:
             except httpx.HTTPStatusError as e:
                 logger.error(f"HTTP error {e.response.status_code} for {method} {url}: {e.response.text}")
                 span.record_exception(e)
-                raise AppError(message=e.response.text, uri=url, status_code=e.response.status_code) from e
+                raise AppError(message=e.response.text, uri=url, status_code=e.response.status_code, error=str(e), error_type=type(e).__name__) from e
             except httpx.HTTPError as e:
                 logger.error(f"Network/transport error for {method} {url}: {e}")
                 span.record_exception(e)
-                raise AppError(message=f"Network/transport error for {method} {url}: {e}", uri=url, status_code=None) from e
-
+                raise AppError(message=f"Network/transport error for {method} {url}: {e}", uri=url, status_code=None, error=str(e), error_type=type(e).__name__) from e
 
     # Optional convenience helpers delegating to request():
     async def get(self, path: str, params: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Optional[Any]:

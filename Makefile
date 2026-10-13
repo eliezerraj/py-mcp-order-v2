@@ -12,11 +12,15 @@ export ORDER_URL=http://localhost:7001
 export METRICS_HOST=0.0.0.0
 export METRICS_PORT=8501
 
+export AUTHORIZATION_DRY_RUN=False
+export AUTHORIZATION_JWKS_URL=http://localhost:7100/v1/.well-known/jwks.json
+export AUTHORIZATION_ISSUER=go-authorizer-v2
+export AUTHORIZATION_AUDIENCE=go-ecommerce
+
 export LOG_LEVEL=INFO
 export OTEL_EXPORTER_OTLP_ENDPOINT=localhost:4317
 export OTEL_STDOUT_LOG_GROUP=False
 export LOG_GROUP=/mnt/c/Eliezer/log/py-mcp-order-v2.log
-export MCP_VALIDATE_CONTEXT=false
 
 # Default target
 all: env activate run
