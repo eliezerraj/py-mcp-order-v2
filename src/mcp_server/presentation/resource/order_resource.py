@@ -5,7 +5,6 @@ from opentelemetry import trace
 
 from src.mcp_server.common.exceptions.app_error import AppError
 from src.mcp_server.infrastructure.auth.cedar_verifier import CedarVerifier
-
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 from src.mcp_server.infrastructure.telemetry.metric import (
     TOOL_CALLS,
@@ -49,7 +48,7 @@ class OrderResource:
             """
             logger.info(f"Fetching order service info")
             
-            with tracer.start_as_current_span("resource.get_order_service_info"):
+            with tracer.start_as_current_span("resource.get_order_service_info") as span:
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
                 
@@ -76,7 +75,7 @@ class OrderResource:
             """
             logger.info(f"Fetching order for order number: {order_number}")
         
-            with tracer.start_as_current_span("resource.get_order"):
+            with tracer.start_as_current_span("resource.get_order") as span:
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
             
@@ -86,8 +85,8 @@ class OrderResource:
                         logger.info("Authorization dry run enabled, skipping Cedar verification.")
                     else:
                         self.cedar_verifier.validate(
-                            action="call_tool",
-                            resource_type="Tool",
+                            action="call_resource",
+                            resource_type="Resource",
                             resource_id="get_order",
                             resource_attrs={"data": order_number},
                         )
@@ -114,7 +113,7 @@ class OrderResource:
             """
             logger.info(f"Fetching time series order items for product: {product}")
 
-            with tracer.start_as_current_span("resource.get_time_series_order_items"):
+            with tracer.start_as_current_span("resource.get_time_series_order_items") as span:
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
 
@@ -124,8 +123,8 @@ class OrderResource:
                         logger.info("Authorization dry run enabled, skipping Cedar verification.")
                     else:
                         self.cedar_verifier.validate(
-                            action="call_tool",
-                            resource_type="Tool",
+                            action="call_resource",
+                            resource_type="Resource",
                             resource_id="get_time_series_order_items",
                             resource_attrs={"data": product},
                         )

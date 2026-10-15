@@ -5,12 +5,18 @@ from src.mcp_server.infrastructure.auth.cedar_verifier import CedarVerifier
 
 from opentelemetry import trace
 
-from src.mcp_server.infrastructure.telemetry.metric import TOOL_CALLS, TOOL_DURATION, TOOL_ERRORS, ACTIVE_REQUESTS
 from src.mcp_server.config.settings import settings
 from src.mcp_server.domain.dto.context import SecurityContext
 from src.mcp_server.domain.dto.order import OrderPayload
 from src.mcp_server.domain.dto.checkout import CheckoutPayload
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
+
+from src.mcp_server.infrastructure.telemetry.metric import (
+    TOOL_CALLS,
+    TOOL_DURATION, 
+    TOOL_ERRORS, 
+    ACTIVE_REQUESTS
+)
 
 logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -44,7 +50,7 @@ class OrderTool:
             """
             logger.info(f"Creating order with payload: {payload}")
                     
-            with tracer.start_as_current_span("tool.post_order"):
+            with tracer.start_as_current_span("tool.post_order") as span:
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
                 
@@ -90,7 +96,7 @@ class OrderTool:
             """
             logger.info(f"Creating checkout with payload: {payload}")
 
-            with tracer.start_as_current_span("tool.post_checkout"):
+            with tracer.start_as_current_span("tool.post_checkout") as span:
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
                 

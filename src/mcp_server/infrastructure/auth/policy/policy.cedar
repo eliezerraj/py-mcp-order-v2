@@ -7,10 +7,12 @@ when {
     principal.client_id == "blocked-client"
 };
 
+// RESOURCE_CALL 
+
 permit(
     principal,
-    action == Action::"call_tool",
-    resource == Tool::"get_order"
+    action == Action::"call_resource",
+    resource == Resource::"get_order"
 )
 when {
     principal.scopes.contains("order:read")
@@ -18,12 +20,14 @@ when {
 
 permit(
     principal,
-    action == Action::"call_tool",
-    resource == Tool::"get_time_series_order_items"
+    action == Action::"call_resource",
+    resource == Resource::"get_time_series_order_items"
 )
 when {
-    principal.scopes.contains("order:read")
+    principal.scopes.contains("order:history")
 };
+
+// TOOL_CALLS
 
 permit(
     principal,
@@ -37,7 +41,7 @@ when {
 permit(
     principal,
     action == Action::"call_tool",
-    resource == Tool::"post_order"
+    resource == Tool::"post_checkout"
 )
 when {
     principal.scopes.contains("checkout:create")
