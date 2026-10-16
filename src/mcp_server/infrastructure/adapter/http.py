@@ -55,6 +55,8 @@ class HttpAdapter:
             **(headers or {}),
         }
 
+        logger.info(f"headers for request: {merged_headers}")
+
         # Inject OpenTelemetry trace context propagation into outgoing headers
         propagate.inject(merged_headers)
 
