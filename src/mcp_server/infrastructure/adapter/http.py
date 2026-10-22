@@ -88,11 +88,11 @@ class HttpAdapter:
             except httpx.HTTPStatusError as e:
                 logger.error(f"HTTP error {e.response.status_code} for {method} {url}: {e.response.text}")
                 span.record_exception(e)
-                raise AppError(message=e.response.text, uri=url, status_code=e.response.status_code, error=str(e), error_type=type(e).__name__) from e
+                raise AppError(message=e.response.text, status_code=e.response.status_code, error=str(e), error_type=type(e).__name__) from e
             except httpx.HTTPError as e:
                 logger.error(f"Network/transport error for {method} {url}: {e}")
                 span.record_exception(e)
-                raise AppError(message=f"Network/transport error for {method} {url}: {e}", uri=url, status_code=None, error=str(e), error_type=type(e).__name__) from e
+                raise AppError(message=f"Network/transport error for {method} {url}: {e}", status_code=None, error=str(e), error_type=type(e).__name__) from e
 
     # Optional convenience helpers delegating to request():
     async def get(self, path: str, params: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Optional[Any]:

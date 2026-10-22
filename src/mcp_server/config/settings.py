@@ -11,14 +11,17 @@ class Settings:
    
         self.ORDER_URL = os.getenv("ORDER_URL")
         
-        self.METRICS_HOST = os.getenv("HOST")
-        self.METRICS_PORT = int(os.getenv("METRICS_PORT", 8501))
-
         self.AUTHORIZATION_DRY_RUN = os.getenv("AUTHORIZATION_DRY_RUN", "true").lower() == "true"
         self.AUTHORIZATION_JWKS_URL = os.getenv("AUTHORIZATION_JWKS_URL")
         self.AUTHORIZATION_ISSUER = os.getenv("AUTHORIZATION_ISSUER")
         self.AUTHORIZATION_AUDIENCE = os.getenv("AUTHORIZATION_AUDIENCE")
 
+        self.MCP_PROTECTED_RESOURCE = os.getenv("MCP_PROTECTED_RESOURCE")
+        self.AUTHORIZATION_SERVER = os.getenv("AUTHORIZATION_SERVER")
+
+        self.METRICS_HOST = os.getenv("HOST")
+        self.METRICS_PORT = int(os.getenv("METRICS_PORT", 8501))
+                
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
         self.OTEL_EXPORTER_OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
         self.OTEL_STDOUT_LOG_GROUP = os.getenv("OTEL_STDOUT_LOG_GROUP", "false").lower() == "true"
