@@ -30,6 +30,8 @@ from src.mcp_server.presentation.prompt.order_prompt import (
     register_prompt as register_order_prompt,
 )
 
+from src.mcp_server.infrastructure.oauth.protect_resource import PROTECT_RESOURCE_METADATA
+
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -106,21 +108,7 @@ transport_security = TransportSecuritySettings(
 async def oauth_protected_resource_metadata(request: Request) -> JSONResponse:
     logger.info("Handling /.well-known/oauth-protected-resource request")
     return JSONResponse(
-        content={
-            "resource": settings.MCP_PROTECTED_RESOURCE + "/mcp",
-            "authorization_servers": [
-                settings.AUTHORIZATION_SERVER
-            ],
-            "scopes_supported": [
-                "resource:order",
-                "resource:time_series_order_items",
-                "tool:post_order",
-                "tool:post_checkout"
-            ],
-            "bearer_methods_supported": [
-                "header",
-            ],
-        },
+        content=PROTECT_RESOURCE_METADATA,
         headers={
             "Cache-Control": "public, max-age=300",
         },
