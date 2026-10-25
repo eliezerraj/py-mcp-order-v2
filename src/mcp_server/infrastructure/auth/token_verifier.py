@@ -41,7 +41,10 @@ class JwtTokenVerifier:
         )
 
     async def verify_token(self, token: str) -> VerifiedIdentity:
-        logger.info(f"Starting token verification for token={token}")
+        logger.info(f"Starting token verification")
+        print("================= Starting token verification ================")
+        print(token)
+        print("==============================================================")
         
         with tracer.start_as_current_span("jwt.verify_token") as span:
             try:
