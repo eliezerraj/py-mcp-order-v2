@@ -15,7 +15,7 @@ export METRICS_PORT=8501
 export AUTHORIZATION_DRY_RUN=False
 export AUTHORIZATION_JWKS_URL=http://localhost:7100/v1/.well-known/jwks.json
 export AUTHORIZATION_ISSUER=go-authorizer-v2
-export AUTHORIZATION_AUDIENCE=go-ecommerce
+export AUTHORIZATION_AUDIENCE=py-mcp-order-v2
 
 export MCP_PROTECTED_RESOURCE=http://localhost:7501
 export AUTHORIZATION_SERVER=http://localhost:7100

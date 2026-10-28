@@ -16,6 +16,7 @@ from src.mcp_server.presentation.tool.order_tool import OrderTool
 
 from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
 from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
+from src.mcp_server.infrastructure.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
 from src.mcp_server.infrastructure.telemetry.tracer import setup_tracer
 
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
@@ -82,6 +83,7 @@ async def server_lifespan(app):
             order_resource.register_order_resource()
         
         yield
+    
     finally:
         logger.info("Server shutting down SUCCESSFULLY.")
 
@@ -125,6 +127,7 @@ mcp = MCPServer(name=settings.APP_NAME,
 # Add middleware to the MCP server application (ASGI compatible)
 mcp_app = mcp.streamable_http_app(transport_security=transport_security)
 mcp_app.add_middleware(RequestContextMiddleware)
+#mcp_app.add_middleware(CedarAuthorizationMiddleware)
 mcp_app.add_middleware(PrometheusMiddleware)
 
 # ---------------------------------

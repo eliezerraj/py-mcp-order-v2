@@ -25,7 +25,6 @@ class OrderTool:
     def __init__(self, mcp: "MCPServer", order_use_case: OrderUseCase):
         self.mcp = mcp
         self.order_use_case = order_use_case
-        
         self.cedar_verifier = CedarVerifier()
         logger.info("OrderTool initialized SUCCESSFULLY.")
         
@@ -51,6 +50,7 @@ class OrderTool:
             logger.info(f"Creating order with payload: {payload}")
                     
             with tracer.start_as_current_span("tool.post_order") as span:
+                
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
                 
@@ -68,6 +68,7 @@ class OrderTool:
                     
                     response = await self.order_use_case.post_order(payload.model_dump()) 
                     TOOL_CALLS.labels(tool="post_order").inc()
+                    
                 except Exception as e:
                     TOOL_ERRORS.labels(tool="post_order").inc()
                     logger.error(f"Error creating order with payload {payload}: {e}")
@@ -97,6 +98,7 @@ class OrderTool:
             logger.info(f"Creating checkout with payload: {payload}")
 
             with tracer.start_as_current_span("tool.post_checkout") as span:
+                
                 ACTIVE_REQUESTS.inc()
                 start_time = time.perf_counter()
                 
@@ -114,6 +116,7 @@ class OrderTool:
                       
                     response = await self.order_use_case.post_checkout(payload.model_dump()) 
                     TOOL_CALLS.labels(tool="post_checkout").inc()
+                    
                 except Exception as e:
                     TOOL_ERRORS.labels(tool="post_checkout").inc()
                     logger.error(f"Error creating checkout with payload {payload}: {e}")

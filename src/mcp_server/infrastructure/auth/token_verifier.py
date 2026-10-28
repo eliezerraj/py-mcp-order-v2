@@ -41,14 +41,14 @@ class JwtTokenVerifier:
         )
 
     async def verify_token(self, token: str) -> VerifiedIdentity:
-        logger.info(f"Starting token verification")
+        logger.info("Starting token verification")
         print("================= Starting token verification ================")
         print(token)
         print("==============================================================")
         
         with tracer.start_as_current_span("jwt.verify_token") as span:
             try:
-                if not token:
+                if not token or token is None:
                     raise MissingTokenError(status_code=401, error="UNAUTHORIZED", error_type="MissingTokenError", message="Missing token")
 
                 claims = await self._verify_signature_and_claims(token)
@@ -69,7 +69,7 @@ class JwtTokenVerifier:
                 
             except jwt.InvalidTokenError as e:
                 logger.warning(f"JWT verification failed: {str(e)}")
-                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="InvalidAccessTokenError", message=f"JWT verification failed: {str(e)}")
+                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="jwt.InvalidTokenError", message=f"JWT verification failed: {str(e)}")
             except InvalidAccessTokenError as e:
                 logger.warning(f"Invalid access token encountered")
                 raise e
@@ -78,12 +78,13 @@ class JwtTokenVerifier:
                 raise e
             except jwt.PyJWKClientError as e:
                 logger.error(f"JWT JWK client error: {str(e)}")
-                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="InvalidAccessTokenError", message=f"JWK client error: {str(e)}")
+                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="jwt.PyJWKClientError", message=f"JWK client error: {str(e)}")
             except Exception as e:
                 logger.error(f"Unexpected error during token verification: {str(e)}")
-                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="InvalidAccessTokenError", message=f"Token verification failed: {str(e)}")
+                raise InvalidAccessTokenError(status_code=401, error="UNAUTHORIZED", error_type="Exception", message=f"Token verification failed: {str(e)}")
 
     async def _verify_signature_and_claims(self, token: str) -> dict[str, Any]:
+        logger.info("Starting _verify_signature_and_claims")
         try:
             signing_key = await asyncio.to_thread(self.jwks_client.get_signing_key_from_jwt, token, )
             
@@ -110,24 +111,17 @@ class JwtTokenVerifier:
 
     @staticmethod
     def _extract_roles(claims: dict[str, Any]) -> set[str]:
-        roles: set[str] = set()
-        direct_roles = claims.get("roles", [])
-        if isinstance(direct_roles, list):
-            roles.update(
-                role for role in direct_roles
-                if isinstance(role, str)
-            )
+        raw_role = claims.get("role", "")
+        if isinstance(raw_role, str):
+            return set(raw_role.split())
 
-        realm_access = claims.get("realm_access", {})
-        if isinstance(realm_access, dict):
-            realm_roles = realm_access.get("roles", [])
-            if isinstance(realm_roles, list):
-                roles.update(
-                    role for role in realm_roles
-                    if isinstance(role, str)
-                )
+        if isinstance(raw_role, list):
+            return {
+                scope for scope in raw_role
+                if isinstance(scope, str)
+            }
 
-        return roles
+        return set()
 
     @staticmethod
     def _extract_scopes(claims: dict[str, Any]) -> set[str]:
