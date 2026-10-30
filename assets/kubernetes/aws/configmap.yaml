@@ -12,7 +12,8 @@ data:
   ACCOUNT: "aws:908671954593"
   HOST: "0.0.0.0"
   PORT: "7501"
-
+  SESSION_TIMEOUT: "700"
+  
   ORDER_URL: "https://go-order-v2.architecture.xpto.io"
 
   METRICS_HOST: "0.0.0.0"
