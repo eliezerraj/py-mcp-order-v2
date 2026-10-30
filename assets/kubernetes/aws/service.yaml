@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app-name svc-py-mcp-order-v2
+  namespace: test-a
+  labels:
+    app: *app-name
+spec:
+  type: ClusterIP
+  ports:
+  - port: 7501
+    targetPort: 7501
+    protocol: TCP
+    name: http
+  - port: 8501
+    targetPort: 8501
+    protocol: TCP
+    name: metrics
+  selector:
+    app: py-mcp-order-v2
