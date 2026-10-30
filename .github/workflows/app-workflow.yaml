@@ -43,7 +43,7 @@ jobs:
         python-version: ${{ needs.setup-environment.outputs.PYTHON_VERSION }}
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
 
     - name: Install dependencies and build Python package
       run: |
@@ -191,7 +191,5 @@ jobs:
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/service.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/hpa.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/pod-disruption.yaml
-          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/external-secret.yaml
-          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/secret-store.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}/ing.yaml
-          kubectl rollout restart deployment/go-order-v2 --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }}
+          kubectl rollout restart deployment/py-mc-order-v2 --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }}
