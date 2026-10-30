@@ -1,0 +1,26 @@
+[
+  {
+    "ParameterKey": "Env",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "RepositoryName",
+    "ParameterValue": "py-mcp-order-v2"
+  },
+  {
+    "ParameterKey": "Namespace",
+    "ParameterValue": "test-a"
+  },
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "arch-eks-01-02"
+  },
+  {
+    "ParameterKey": "ServiceAccountName",
+    "ParameterValue": "sa-py-mcp-order-v2"
+  },
+  {
+    "ParameterKey": "RoleName",
+    "ParameterValue": "PyMcpOrderV2"
+  }
+]
