@@ -23,12 +23,13 @@ FROM python:3.14-slim AS runner
 
 WORKDIR /app
 
-COPY --from=builder --chown=appuser:appgroup /app/.venv /app/.venv
-COPY --from=builder --chown=appuser:appgroup /app/src /app/src
+COPY --from=builder --chown=1100:2000 /app/.venv /app/.venv
+COPY --from=builder --chown=1100:2000 /app/src /app/src
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-EXPOSE 8000
+EXPOSE 7501 8501
+USER 1100:2000
 CMD ["python", "-m", "src.mcp_server.main"]

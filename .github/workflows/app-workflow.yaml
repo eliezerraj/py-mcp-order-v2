@@ -14,9 +14,6 @@ on:
         required: true
         default: 'us-east-2'
 
-env:
-  GO_VERSION: 1.26
-
 defaults:
   run:
     shell: bash
@@ -40,19 +37,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7.0.1
 
-    - name: Setup go env
-      uses: actions/setup-go@v7.0.0
+    - name: Setup Python
+      uses: actions/setup-python@v6
       with:
-        go-version: ${{ env.GO_VERSION }}
+        python-version: ${{ needs.setup-environment.outputs.PYTHON_VERSION }}
 
-    - name: Install dependencies
-      run: go mod tidy
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v6
 
-    - name: Build image
-      env:
-        REPO_NAME: ${{ needs.setup-environment.outputs.REPO_NAME }}
-        MAIN_GO_FILE: ${{ needs.setup-environment.outputs.MAIN_GO_FILE }}
-      run: go build -v -o $REPO_NAME $MAIN_GO_FILE
+    - name: Install dependencies and build Python package
+      run: |
+        uv sync --no-dev
+        uv run --no-sync python -m compileall -q src
 
   infra-as-code:
     runs-on: ubuntu-latest
