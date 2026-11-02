@@ -54,6 +54,7 @@ class CedarVerifier:
         
         logger.info("CedarVerifier validate called with action=%s, resource_type=%s, resource_id=%s, resource_attrs=%s, context=%s", action, resource_type, resource_id, resource_attrs, context)
         with tracer.start_as_current_span("cedar_verifier.validate") as span:    
+            
             security = get_security_context()
             
             request = {
@@ -77,6 +78,7 @@ class CedarVerifier:
                     "attrs": {
                         "client_id": security.subject,
                         "scopes": list(security.scopes),
+                        "roles": list(security.roles),
                     },
                     "parents": [],
                 },
@@ -99,9 +101,9 @@ class CedarVerifier:
             )
 
             print("===========cedar authorization result===================")
-            print("Request: %s", request)
-            print("Entities: %s", entities)
-            print("Authorization result: %s", result.allowed)
+            print("Request:", request)
+            print("Entities:", entities)
+            print("Authorization result:", result.allowed)
             print("===========cedar authorization result===================")
 
             if not result.allowed:

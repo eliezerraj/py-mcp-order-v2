@@ -17,6 +17,7 @@ from src.mcp_server.infrastructure.context.request_context import get_security_c
 logger = logging.getLogger(__name__)
 
 CEDAR_AUTH_EXCLUDED_PATHS = ["/metrics", "/health", "/.well-known/oauth-protected-resource"]
+CEDAR_AUTH_EXCLUDED_URI = ["mcp_info://"]
 
 class CedarAuthorizationMiddleware(BaseHTTPMiddleware):
     """
@@ -69,7 +70,10 @@ class CedarAuthorizationMiddleware(BaseHTTPMiddleware):
                 resource_uri = payload.get("params", {}).get("uri", "")
                 
                 logger.info(f"Intercepting resource call: {resource_uri}")
-                
+
+                if any(resource_uri.startswith(uri) for uri in CEDAR_AUTH_EXCLUDED_URI):
+                    return await call_next(request)
+                                
                 # Map resource URI to Cedar authorization action
                 resource_id, resource_attrs = self._parse_resource_uri(resource_uri)
                 
@@ -97,17 +101,6 @@ class CedarAuthorizationMiddleware(BaseHTTPMiddleware):
                     )
 
             print("---------------------------5 end------------------------")            
-            # Create a new receive callable that returns the stored body
-            async def receive():
-                return {
-                    "type": "http.request",
-                    "body": body,
-                    "more_body": False,
-                }
-            
-            # Replace request's receive method
-            request._receive = receive
-            
         except Exception as e:
             logger.error(f"Error in CedarAuthorizationMiddleware: {e}")
             # Let other errors pass through; don't block on middleware errors

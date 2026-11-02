@@ -91,17 +91,9 @@ async def server_lifespan(app):
 # Transport security
 # -------------------------------------------------------------------
 transport_security = TransportSecuritySettings(
-    enable_dns_rebinding_protection=True,
-    allowed_hosts=[
-        "localhost:*",
-        "127.0.0.1:*",
-        "py-mcp-order-v2:*",
-    ],
-    allowed_origins=[
-        "http://localhost:*",
-        "http://127.0.0.1:*",
-        "http://py-mcp-order-v2:*",
-    ],
+    enable_dns_rebinding_protection=settings.ENABLE_DNS_REBINDING_PROTECTION,
+    allowed_hosts=settings.ALLOWED_HOSTS,
+    allowed_origins=settings.ALLOWED_ORIGINS,
 )
 
 # -------------------------------------------------------------------
@@ -132,9 +124,9 @@ mcp = MCPServer(name=settings.APP_NAME,
 
 # Add middleware to the MCP server application (ASGI compatible)
 mcp_app = mcp.streamable_http_app(transport_security=transport_security)
-mcp_app.add_middleware(RequestContextMiddleware)
-#mcp_app.add_middleware(CedarAuthorizationMiddleware)
 mcp_app.add_middleware(PrometheusMiddleware)
+mcp_app.add_middleware(CedarAuthorizationMiddleware)
+mcp_app.add_middleware(RequestContextMiddleware)
 
 # ---------------------------------
 # OAuth application lifespan

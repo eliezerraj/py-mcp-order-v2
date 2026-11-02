@@ -150,13 +150,16 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                 )
             
             # Step 6: Set security context for this request
+            logger.info(f"Setting security context")
             token = set_security_context(sec_context)
             
             try:
+                logger.info(f"Processing request with security context")
                 # Step 7: Process request with security context
                 response = await call_next(request)
                 response.headers["x-request-id"] = request_id
                 return response
             finally:
+                logger.info(f"Resetting security context")
                 # Step 8: Always reset context
                 reset_security_context(token)

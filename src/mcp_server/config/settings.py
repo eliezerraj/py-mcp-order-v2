@@ -21,7 +21,19 @@ class Settings:
 
         self.METRICS_HOST = os.getenv("HOST")
         self.METRICS_PORT = int(os.getenv("METRICS_PORT", 8501))
-                
+        
+        self.ENABLE_DNS_REBINDING_PROTECTION = os.getenv("ENABLE_DNS_REBINDING_PROTECTION", "false").lower() == "true"
+        self.ALLOWED_HOSTS = [
+            host.strip()
+            for host in os.getenv("ALLOWED_HOSTS").split(",")
+            if host.strip()
+        ]
+        self.ALLOWED_ORIGINS = [
+            origin.strip()
+            for origin in os.getenv("ALLOWED_ORIGINS").split(",")
+            if origin.strip()
+        ]
+
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
         self.OTEL_EXPORTER_OTLP_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
         self.OTEL_STDOUT_LOG_GROUP = os.getenv("OTEL_STDOUT_LOG_GROUP", "false").lower() == "true"

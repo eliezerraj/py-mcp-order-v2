@@ -1,21 +1,20 @@
-forbid(
-    principal,
-    action,
-    resource
-)
-when {
-    principal.client_id == "blocked-client"
-};
-
 // RESOURCE_CALL 
-
 permit(
     principal,
     action == Action::"call_resource",
     resource == Resource::"get_order"
 )
 when {
-    principal.scopes.contains("order:read")
+    principal.roles.contains("order-resource-role")
+};
+
+permit(
+    principal,
+    action == Action::"call_resource",
+    resource == Resource::"get_order_service_info"
+)
+when {
+    principal.roles.contains("order-resource-role")
 };
 
 permit(
@@ -24,7 +23,7 @@ permit(
     resource == Resource::"get_time_series_order_items"
 )
 when {
-    principal.scopes.contains("order:history")
+    principal.roles.contains("order-resource-role")
 };
 
 // TOOL_CALLS
@@ -35,7 +34,7 @@ permit(
     resource == Tool::"post_order"
 )
 when {
-    principal.scopes.contains("order:create")
+    principal.roles.contains("order-resource-role")
 };
 
 permit(
@@ -44,5 +43,5 @@ permit(
     resource == Tool::"post_checkout"
 )
 when {
-    principal.scopes.contains("checkout:create")
+    principal.roles.contains("order-resource-role")
 };

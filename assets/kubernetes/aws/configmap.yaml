@@ -23,10 +23,14 @@ data:
   AUTHORIZATION_JWKS_URL: "https://go-authorizer-v2.architecture.xpto.io/v1/.well-known/jwks.json"
   AUTHORIZATION_ISSUER: "go-authorizer-v2"
   AUTHORIZATION_AUDIENCE: "py-mcp-order-v2"
+  
+  ENABLE_DNS_REBINDING_PROTECTION: "False"
+  ALLOWED_HOSTS: "py-mcp-order-v2.architecturedev.xpto.io:*"
+  ALLOWED_ORIGINS: "https://py-mcp-order-v2.architecturedev.xpto.io:*"
 
-  MCP_PROTECTED_RESOURCE: "py-mcp-order-v2.architecture.xpto.io:7501"
+  MCP_PROTECTED_RESOURCE: "https://py-mcp-order-v2.architecture.xpto.io"
   AUTHORIZATION_SERVER: "https://go-authorizer-v2.architecture.xpto.io"
-
+ 
   METRICS_LOG_LEVEL: "INFO"
   OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-01-02-otel-collector.default.svc.cluster.local:4317"
   OTEL_STDOUT_LOG_GROUP: "False"
