@@ -3,7 +3,7 @@ import time
 
 from starlette.requests import Request
 
-from src.mcp_server.infrastructure.telemetry.metric import (
+from src.mcp_server.infrastructure.observability.metric import (
     REQUEST_COUNT,
     REQUEST_LATENCY,
 )

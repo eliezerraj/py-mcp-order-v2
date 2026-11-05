@@ -6,13 +6,12 @@ from cedarpy import (
     is_authorized,
 )
 
-from src.mcp_server.domain.dto.context import SecurityContext
-
-from src.mcp_server.common.exceptions.auth_error import (
+from src.mcp_server.domain.exceptions import (
     ForbiddenError,
 )
 
-from src.mcp_server.infrastructure.context.request_context import (
+from src.mcp_server.domain.model.context import (
+    SecurityContext,
     get_security_context,
 )
 
@@ -31,7 +30,7 @@ class CedarVerifier:
 
         try:
             base_path = Path(__file__).parent.parent.parent.parent
-            file_path = base_path / "mcp_server/infrastructure/auth/policy/policy.cedar"
+            file_path = base_path / "mcp_server/infrastructure/security/policy/policy.cedar"
                 
             policy_text = Path(file_path).read_text(encoding="utf-8")
             self.policy_set = PolicySet.from_str(policy_text)
@@ -54,6 +53,7 @@ class CedarVerifier:
         
         logger.info("CedarVerifier validate called with action=%s, resource_type=%s, resource_id=%s, resource_attrs=%s, context=%s", action, resource_type, resource_id, resource_attrs, context)
         with tracer.start_as_current_span("cedar_verifier.validate") as span:    
+            
             security = get_security_context()
             
             request = {
@@ -77,6 +77,7 @@ class CedarVerifier:
                     "attrs": {
                         "client_id": security.subject,
                         "scopes": list(security.scopes),
+                        "roles": list(security.roles),
                     },
                     "parents": [],
                 },
@@ -99,9 +100,9 @@ class CedarVerifier:
             )
 
             print("===========cedar authorization result===================")
-            print("Request: %s", request)
-            print("Entities: %s", entities)
-            print("Authorization result: %s", result.allowed)
+            print("Request:", request)
+            print("Entities:", entities)
+            print("Authorization result:", result.allowed)
             print("===========cedar authorization result===================")
 
             if not result.allowed:

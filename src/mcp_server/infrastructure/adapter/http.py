@@ -2,10 +2,10 @@ import httpx
 import logging
 from typing import Any, Optional, Dict
 
-from src.mcp_server.common.exceptions.app_error import AppError
+from src.mcp_server.domain.external.error_response import AppError
 
 from opentelemetry import trace, propagate
-from src.mcp_server.infrastructure.context.request_context import (
+from src.mcp_server.domain.model.context import (
     get_security_context,
 )
 

@@ -8,18 +8,20 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from src.mcp_server.infrastructure.auth.token_verifier import JwtTokenVerifier
+from src.mcp_server.infrastructure.security.token_verifier import JwtTokenVerifier
 from src.mcp_server.config.settings import settings
-from src.mcp_server.domain.dto.context import SecurityContext
-from src.mcp_server.config.logger import REQUEST_ID_CTX
-from src.mcp_server.infrastructure.context.request_context import (
+from src.mcp_server.infrastructure.observability.logger import REQUEST_ID_CTX
+
+from src.mcp_server.domain.model.context import (
+    SecurityContext,
     set_security_context,
     reset_security_context,
 )
 
-from src.mcp_server.common.exceptions.auth_error import (
+from src.mcp_server.domain.exceptions import (
     InvalidAccessTokenError,
     MissingTokenError,
+    ForbiddenError,
 )
 
 #---------------------------------
@@ -150,13 +152,16 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                 )
             
             # Step 6: Set security context for this request
+            logger.info(f"Setting security context")
             token = set_security_context(sec_context)
             
             try:
+                logger.info(f"Processing request with security context")
                 # Step 7: Process request with security context
                 response = await call_next(request)
                 response.headers["x-request-id"] = request_id
                 return response
             finally:
+                logger.info(f"Resetting security context")
                 # Step 8: Always reset context
                 reset_security_context(token)

@@ -1,0 +1,167 @@
+import sys
+import logging
+import httpx
+import uvicorn
+
+from threading import Thread
+
+from contextlib import asynccontextmanager
+from opentelemetry import trace
+
+from prometheus_client import make_asgi_app
+
+from src.mcp_server.infrastructure.adapter.http import HttpAdapter
+from src.mcp_server.presentation.resource.order_resource import OrderResource
+from src.mcp_server.presentation.tool.order_tool import OrderTool
+from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
+from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
+from src.mcp_server.infrastructure.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
+from src.mcp_server.infrastructure.observability.tracer import setup_tracer
+from src.mcp_server.infrastructure.observability.logger import setup_logger
+
+from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
+
+from src.mcp_server.config.settings import settings
+
+from mcp.server.transport_security import TransportSecuritySettings
+from mcp.server.mcpserver import MCPServer
+
+from src.mcp_server.presentation.prompt.order_prompt import (
+    register_prompt as register_order_prompt,
+)
+
+from src.mcp_server.infrastructure.oauth.protect_resource import PROTECT_RESOURCE_METADATA
+
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from starlette.routing import Mount, Route
+
+setup_logger(settings.LOG_LEVEL, 
+             settings.APP_NAME, 
+             settings.OTEL_STDOUT_LOG_GROUP, 
+             settings.LOG_GROUP)
+
+logger = logging.getLogger(__name__)
+    
+# Setup OpenTelemetry tracer
+setup_tracer(settings.APP_NAME, 
+             settings.OTEL_EXPORTER_OTLP_ENDPOINT)
+
+tracer = trace.get_tracer(__name__)
+  
+# -------------------------------------------------------------------
+# MCP lifespan
+# -------------------------------------------------------------------       
+@asynccontextmanager
+async def server_lifespan(app, mcp: MCPServer):
+    logger.info("Initializing Enterprise MCP Server resources SUCCESSFULLY...")
+    
+    try:
+        # Initialize HTTP client for inventory service
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(settings.SESSION_TIMEOUT),
+            limits=httpx.Limits(max_keepalive_connections=20, max_connections=100)
+        ) as http_client:
+        
+            # Initialize inventory adapter with the inventory service URL
+            http_adapter = HttpAdapter(settings.ORDER_URL)
+            
+            # Initialize order use case
+            order_usecase = OrderUseCase(http_adapter)
+            
+            # Register order tool with the MCP server
+            order_tool = OrderTool(mcp, order_usecase)
+            order_tool.register_order_tool()
+
+            # Register order prompts
+            register_order_prompt(mcp)
+
+            # Register resource
+            order_resource = OrderResource(mcp, order_usecase)
+            order_resource.register_order_resource()
+        
+        yield
+    
+    finally:
+        logger.info("Server shutting down SUCCESSFULLY.")
+
+# ---------------------------------
+# OAuth application lifespan
+# ---------------------------------
+@asynccontextmanager
+async def application_lifespan(app: Starlette, mcp: MCPServer):
+    async with mcp.session_manager.run():
+        yield
+
+# -------------------------------------------------------------------
+# OAuth Protected Resource Metadata
+# -------------------------------------------------------------------
+async def oauth_protected_resource_metadata(request: Request) -> JSONResponse:
+    logger.info("Handling /.well-known/oauth-protected-resource request")
+    return JSONResponse(
+        content=PROTECT_RESOURCE_METADATA,
+        headers={
+            "Cache-Control": "public, max-age=300",
+        },
+    )
+
+async def health(request: Request) -> JSONResponse:
+    logger.info("Handling /health request")
+    return JSONResponse(
+        content={"status": "ok"},
+    )
+        
+# -------------------------------------------------------------------
+# Transport security
+# -------------------------------------------------------------------
+transport_security = TransportSecuritySettings(
+    enable_dns_rebinding_protection=settings.ENABLE_DNS_REBINDING_PROTECTION,
+    allowed_hosts=settings.ALLOWED_HOSTS,
+    allowed_origins=settings.ALLOWED_ORIGINS,
+)
+
+#---------------------------------
+# setup MCP server
+#---------------------------------
+def create_app():
+    logger.info("Initializing server resources")
+
+    mcp = MCPServer(name=settings.APP_NAME,
+                    lifespan=lambda app: server_lifespan(app, mcp),
+                    debug=True,
+    )
+    
+    # Add middleware to the MCP server application (ASGI compatible)
+    mcp_app = mcp.streamable_http_app(transport_security=transport_security)
+    mcp_app.add_middleware(PrometheusMiddleware)
+    mcp_app.add_middleware(CedarAuthorizationMiddleware)
+    mcp_app.add_middleware(RequestContextMiddleware)
+
+    # Define routes
+    routes = [
+        Route(
+            "/.well-known/oauth-protected-resource",
+            endpoint=oauth_protected_resource_metadata,
+            methods=["GET"],
+            name="oauth-protected-resource-metadata",
+        ),
+        Route(
+            "/health",
+            endpoint=health,
+            methods=["GET"],
+            name="health",
+        ),
+        Mount(
+            "/",
+            app=mcp_app,
+            name="mcp",
+        ),
+    ]
+    
+    app = Starlette(
+        routes=routes,
+        lifespan=lambda app: application_lifespan(app, mcp),
+    )
+    
+    return app
