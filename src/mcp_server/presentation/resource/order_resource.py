@@ -4,10 +4,10 @@ import time
 from opentelemetry import trace
 
 from src.mcp_server.config.settings import settings
-from src.mcp_server.common.exceptions.app_error import AppError
+from src.mcp_server.domain.external.error_response import AppError
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
-from src.mcp_server.domain.dto.order import OrderResponse, TimeSeriesResponse
-from src.mcp_server.infrastructure.telemetry.metric import (
+from src.mcp_server.domain.model.order import OrderResponse, TimeSeriesResponse
+from src.mcp_server.infrastructure.observability.metric import (
     TOOL_CALLS,
     TOOL_DURATION, 
     TOOL_ERRORS, 
@@ -105,6 +105,9 @@ class OrderResource:
                         payment_details=order_data.get("payment_details") if isinstance(order_data, dict) else None
                     )
                     
+                except AppError as e:
+                    logger.error(f"Error AppError fetching order for order number {order_number}: {e}")
+                    return e.to_dict()                     
                 except Exception as e:
                     TOOL_ERRORS.labels(tool="order://{order_number}").inc()
                     logger.error(f"Error fetching order for order number {order_number}: {e}")
@@ -147,7 +150,10 @@ class OrderResource:
                         product=time_series_data.get("product") if isinstance(time_series_data, dict) else None,
                         time_series_data=time_series_data.get("time_series_data") if isinstance(time_series_data, dict) else None,
                     )
-                                        
+
+                except AppError as e:
+                    logger.error(f"Error AppError fetching time series order items for product {product}: {e}")
+                    return e.to_dict()                                         
                 except Exception as e:
                     TOOL_ERRORS.labels(tool="time_series_order_items://{product}{?limit,offset}").inc()
                     logger.error(f"Error fetching time series order items for product {product}: {e}")

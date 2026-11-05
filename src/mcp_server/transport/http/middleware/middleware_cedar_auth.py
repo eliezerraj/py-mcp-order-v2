@@ -6,10 +6,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from src.mcp_server.infrastructure.auth.cedar_verifier import CedarVerifier
-from src.mcp_server.common.exceptions.auth_error import ForbiddenError
+from src.mcp_server.infrastructure.security.cedar_verifier import CedarVerifier
+from src.mcp_server.domain.exceptions import ForbiddenError
 from src.mcp_server.config.settings import settings
-from src.mcp_server.infrastructure.context.request_context import get_security_context
+from src.mcp_server.domain.model.context  import get_security_context
 
 #---------------------------------
 # Configure logging

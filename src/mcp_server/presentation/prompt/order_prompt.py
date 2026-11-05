@@ -1,5 +1,5 @@
 import logging
-from src.mcp_server.domain.dto.order import OrderItem
+from src.mcp_server.domain.model.order import OrderItem
 
 logger = logging.getLogger(__name__)
 

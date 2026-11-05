@@ -6,13 +6,12 @@ from cedarpy import (
     is_authorized,
 )
 
-from src.mcp_server.domain.dto.context import SecurityContext
-
-from src.mcp_server.common.exceptions.auth_error import (
+from src.mcp_server.domain.exceptions import (
     ForbiddenError,
 )
 
-from src.mcp_server.infrastructure.context.request_context import (
+from src.mcp_server.domain.model.context import (
+    SecurityContext,
     get_security_context,
 )
 
@@ -31,7 +30,7 @@ class CedarVerifier:
 
         try:
             base_path = Path(__file__).parent.parent.parent.parent
-            file_path = base_path / "mcp_server/infrastructure/auth/policy/policy.cedar"
+            file_path = base_path / "mcp_server/infrastructure/security/policy/policy.cedar"
                 
             policy_text = Path(file_path).read_text(encoding="utf-8")
             self.policy_set = PolicySet.from_str(policy_text)

@@ -8,18 +8,20 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from src.mcp_server.infrastructure.auth.token_verifier import JwtTokenVerifier
+from src.mcp_server.infrastructure.security.token_verifier import JwtTokenVerifier
 from src.mcp_server.config.settings import settings
-from src.mcp_server.domain.dto.context import SecurityContext
-from src.mcp_server.config.logger import REQUEST_ID_CTX
-from src.mcp_server.infrastructure.context.request_context import (
+from src.mcp_server.infrastructure.observability.logger import REQUEST_ID_CTX
+
+from src.mcp_server.domain.model.context import (
+    SecurityContext,
     set_security_context,
     reset_security_context,
 )
 
-from src.mcp_server.common.exceptions.auth_error import (
+from src.mcp_server.domain.exceptions import (
     InvalidAccessTokenError,
     MissingTokenError,
+    ForbiddenError,
 )
 
 #---------------------------------
