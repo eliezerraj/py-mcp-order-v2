@@ -13,9 +13,11 @@ from prometheus_client import make_asgi_app
 from src.mcp_server.infrastructure.adapter.http import HttpAdapter
 from src.mcp_server.presentation.resource.order_resource import OrderResource
 from src.mcp_server.presentation.tool.order_tool import OrderTool
-from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
-from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
-from src.mcp_server.infrastructure.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
+
+from src.mcp_server.transport.http.middleware.middleware_auth import RequestContextMiddleware
+from src.mcp_server.transport.http.middleware.middleware_metric import PrometheusMiddleware
+from src.mcp_server.transport.http.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
+
 from src.mcp_server.infrastructure.observability.tracer import setup_tracer
 from src.mcp_server.infrastructure.observability.logger import setup_logger
 
