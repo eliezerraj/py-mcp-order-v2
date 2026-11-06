@@ -1,5 +1,4 @@
 import logging
-from src.mcp_server.domain.model.context import SecurityContext
 from opentelemetry import trace
 
 tracer = trace.get_tracer(__name__)

@@ -1,14 +1,8 @@
-import sys
 import logging
 import httpx
-import uvicorn
-
-from threading import Thread
 
 from contextlib import asynccontextmanager
 from opentelemetry import trace
-
-from prometheus_client import make_asgi_app
 
 from src.mcp_server.infrastructure.adapter.http import HttpAdapter
 from src.mcp_server.presentation.resource.order_resource import OrderResource
