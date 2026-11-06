@@ -32,7 +32,7 @@ from src.mcp_server.presentation.prompt.order_prompt import (
     register_prompt as register_order_prompt,
 )
 
-from src.mcp_server.infrastructure.oauth.protect_resource import PROTECT_RESOURCE_METADATA
+from src.mcp_server.infrastructure.security.protect_resource import PROTECT_RESOURCE_METADATA
 
 from starlette.applications import Starlette
 from starlette.requests import Request
