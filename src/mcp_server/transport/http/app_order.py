@@ -1,21 +1,17 @@
-import sys
 import logging
 import httpx
-import uvicorn
-
-from threading import Thread
 
 from contextlib import asynccontextmanager
 from opentelemetry import trace
 
-from prometheus_client import make_asgi_app
-
 from src.mcp_server.infrastructure.adapter.http import HttpAdapter
 from src.mcp_server.presentation.resource.order_resource import OrderResource
 from src.mcp_server.presentation.tool.order_tool import OrderTool
-from src.mcp_server.infrastructure.middleware.middleware import RequestContextMiddleware
-from src.mcp_server.infrastructure.middleware.middleware_metric import PrometheusMiddleware
-from src.mcp_server.infrastructure.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
+
+from src.mcp_server.transport.http.middleware.middleware_auth import RequestContextMiddleware
+from src.mcp_server.transport.http.middleware.middleware_metric import PrometheusMiddleware
+from src.mcp_server.transport.http.middleware.middleware_cedar_auth import CedarAuthorizationMiddleware
+
 from src.mcp_server.infrastructure.observability.tracer import setup_tracer
 from src.mcp_server.infrastructure.observability.logger import setup_logger
 
@@ -30,7 +26,7 @@ from src.mcp_server.presentation.prompt.order_prompt import (
     register_prompt as register_order_prompt,
 )
 
-from src.mcp_server.infrastructure.oauth.protect_resource import PROTECT_RESOURCE_METADATA
+from src.mcp_server.infrastructure.security.protect_resource import PROTECT_RESOURCE_METADATA
 
 from starlette.applications import Starlette
 from starlette.requests import Request

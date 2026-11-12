@@ -21,7 +21,6 @@ from src.mcp_server.domain.model.context import (
 from src.mcp_server.domain.exceptions import (
     InvalidAccessTokenError,
     MissingTokenError,
-    ForbiddenError,
 )
 
 #---------------------------------

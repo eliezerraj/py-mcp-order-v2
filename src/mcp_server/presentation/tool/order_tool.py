@@ -3,8 +3,6 @@ import time
 
 from opentelemetry import trace
 
-from src.mcp_server.config.settings import settings
-from src.mcp_server.domain.model.context import SecurityContext
 from src.mcp_server.domain.model.order import OrderPayload, OrderResponse, CheckoutPayload, CheckoutResponse
 from src.mcp_server.domain.usecase.order_usecase import OrderUseCase
 

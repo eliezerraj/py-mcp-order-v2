@@ -3,8 +3,8 @@ import uvicorn
 
 from prometheus_client import start_http_server
 
-from mcp_server.transport.http.app import create_app
-from mcp_server.config.settings import settings
+from src.mcp_server.transport.http.app_order import create_app
+from src.mcp_server.config.settings import settings
 
 logger = logging.getLogger(__name__)
 

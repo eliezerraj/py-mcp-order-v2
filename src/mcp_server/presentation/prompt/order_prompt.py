@@ -1,6 +1,4 @@
 import logging
-from src.mcp_server.domain.model.order import OrderItem
-
 logger = logging.getLogger(__name__)
 
 def register_prompt(mcp: "MCPServer") -> None:

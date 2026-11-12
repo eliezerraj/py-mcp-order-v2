@@ -11,7 +11,6 @@ from src.mcp_server.domain.exceptions import (
 )
 
 from src.mcp_server.domain.model.context import (
-    SecurityContext,
     get_security_context,
 )
 

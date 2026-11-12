@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from typing import Optional
 
 class Product(BaseModel):
     id: Optional[int] = Field(

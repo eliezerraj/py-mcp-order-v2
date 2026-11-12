@@ -9,8 +9,6 @@ from starlette.responses import JSONResponse, Response
 from src.mcp_server.infrastructure.security.cedar_verifier import CedarVerifier
 from src.mcp_server.domain.exceptions import ForbiddenError
 from src.mcp_server.config.settings import settings
-from src.mcp_server.domain.model.context  import get_security_context
-
 #---------------------------------
 # Configure logging
 #---------------------------------
