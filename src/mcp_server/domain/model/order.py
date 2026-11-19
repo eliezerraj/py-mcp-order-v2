@@ -1,6 +1,28 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+class Price(BaseModel):
+    currency: str = Field(
+        description="ISO currency code, for example BRL or USD"
+    )
+    amount: float = Field(
+        description="Product price amount"
+    )
+
+class Inventory(BaseModel):
+    available: int = Field(
+        default=0,
+        description="Initial quantity available in inventory"
+    )
+    sold: int = Field(
+        default=0,
+        description="Quantity of product sold. Optional when creating a new product."
+    )
+    pending: int = Field(
+        default=0,
+        description="Quantity of product pending in inventory. Optional when creating a new product."
+    )
+    
 class Product(BaseModel):
     id: Optional[int] = Field(
         default=None,
@@ -25,6 +47,16 @@ class Product(BaseModel):
     status: Optional[str] = Field(
         default=None,
         description="Status of the product"
+    )
+    
+    inventory: Optional[Inventory] = Field(
+        default=None,
+        description="Inventory details of the product"
+    )
+
+    price: Optional[Price] = Field(
+        default=None,
+        description="Price details of the product"
     )
 
 class OrderItem(BaseModel):
@@ -88,8 +120,7 @@ class CreditCard(BaseModel):
         description="Name of the cardholder"
     )
 
-class Payment(BaseModel):
-    
+class Payment(BaseModel):  
     payment_date: str = Field(
         default=None,
         description="Date when the payment detail was recorded"
@@ -205,7 +236,6 @@ class TimeSeriesResponse(BaseModel):
         default=None,
         description="List of time series data points for the product"
     )
-
 
 #---------------------------------
 # Checkout

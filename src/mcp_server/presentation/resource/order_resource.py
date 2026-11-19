@@ -148,6 +148,8 @@ class OrderResource:
                     
                     timeSeriesResponse = TimeSeriesResponse(
                         product=time_series_data.get("product") if isinstance(time_series_data, dict) else None,
+                        inventory=time_series_data.get("product").get("inventory") if isinstance(time_series_data, dict) and "product" in time_series_data and "inventory" in time_series_data.get("product") else None,
+                        price=time_series_data.get("product").get("price") if isinstance(time_series_data, dict) and "product" in time_series_data and "price" in time_series_data.get("product") else None,
                         time_series_data=time_series_data.get("time_series_data") if isinstance(time_series_data, dict) else None,
                     )
 

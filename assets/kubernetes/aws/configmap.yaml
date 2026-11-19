@@ -14,22 +14,22 @@ data:
   PORT: "7501"
   SESSION_TIMEOUT: "700"
   
-  ORDER_URL: "https://go-order-v2.architecture.xpto.io"
+  ORDER_URL: "https://go-order-v2.architecture.x.io"
 
   METRICS_HOST: "0.0.0.0"
   METRICS_PORT: "8501"
 
-  AUTHORIZATION_DRY_RUN: "False"
-  AUTHORIZATION_JWKS_URL: "https://go-authorizer-v2.architecture.xpto.io/v1/.well-known/jwks.json"
+  AUTHORIZATION_DRY_RUN: "True"
+  AUTHORIZATION_JWKS_URL: "https://go-authorizer-v2.architecture.x.io/v1/.well-known/jwks.json"
   AUTHORIZATION_ISSUER: "go-authorizer-v2"
   AUTHORIZATION_AUDIENCE: "py-mcp-order-v2"
   
   ENABLE_DNS_REBINDING_PROTECTION: "False"
-  ALLOWED_HOSTS: "py-mcp-order-v2.architecturedev.xpto.io:*"
-  ALLOWED_ORIGINS: "https://py-mcp-order-v2.architecturedev.xpto.io:*"
+  ALLOWED_HOSTS: "py-mcp-order-v2.architecturedev.x.io:*"
+  ALLOWED_ORIGINS: "https://py-mcp-order-v2.architecturedev.x.io:*"
 
-  MCP_PROTECTED_RESOURCE: "https://py-mcp-order-v2.architecture.xpto.io"
-  AUTHORIZATION_SERVER: "https://go-authorizer-v2.architecture.xpto.io"
+  MCP_PROTECTED_RESOURCE: "https://py-mcp-order-v2.architecture.x.io"
+  AUTHORIZATION_SERVER: "https://go-authorizer-v2.architecture.x.io"
  
   METRICS_LOG_LEVEL: "INFO"
   OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-01-02-otel-collector.default.svc.cluster.local:4317"
